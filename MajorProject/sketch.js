@@ -1,11 +1,33 @@
+let song, analyser;
+let volume = 1.0;
+let pan = 0.0;
+
+// Load the sound file in preload
+function preload() {
+  song = loadSound('asserts/BoogieWoogie.wav');
+}
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
+
+  analyser = new p5.Amplitude();
+  // Connect the input of the analyser to the song
+  analyser.setInput(song);
+  // Add a button for play/pause
+  let button = createButton('Play/Pause');
+  // Set the position of the button to the bottom centre
+  button.position(10, 10);
+  // Set the action of the button by choosing what action and then a function to run
+  button.mousePressed(play_pause);
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
 }
     
 function draw() {
   background(255);
-  noLoop()
-  drawRandomLines()
+  drawRandomLines();
   drawfixedRects();
   randomRect();
   drawColouredHorizontalRoad(min(width, height) / 40 * 21);
@@ -14,6 +36,7 @@ function draw() {
   drawColouredHorizontalRoad(min(width, height) / 40 * 15);
   drawColouredVerticalRoad(min(width, height) / 40 * 13);
   drawColouredHorizontalRoad(min(width, height) / 40 * 37);
+  drawText();
 }
 
 function drawRandomLines(){
@@ -43,7 +66,6 @@ function drawRandomLines(){
   }
 
 }
-
 
 
 //Zichen Zhang
@@ -181,6 +203,29 @@ function drawColouredVerticalRoad(x){
   }
 }
 
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
+
+function drawText() {
+   // Draw the volume value on the screen
+   fill(0);
+   text('Volume: ' + volume.toFixed(2), min(width, height) - 80, min(width, height) / 30);
+   // Draw the pan value on the screen
+   text('Pan: ' + pan.toFixed(2), min(width, height) - 80, min(width, height) / 30 + 15);
+}
+
+function play_pause() {
+  if (song.isPlaying()) {
+    song.stop();
+  } else {
+    song.loop();
+  }
+}
+
+function mouseMoved() {
+  // Map the mouseY to a volume value between 0 and 1
+  volume = map(mouseY, 0, height, 1, 0);
+  song.setVolume(volume);
+
+  // Map the mouseX to a pan value between -1 and 1
+  pan = map(mouseX, 0, width, -1, 1);
+  song.pan(pan);
 }
