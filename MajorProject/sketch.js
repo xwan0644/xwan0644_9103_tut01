@@ -41,7 +41,7 @@ function windowResized() {
     
 function draw() {
   background(255);
-  
+
   drawRandomLines();
   drawRandomRect()
   drawfixedRects();
@@ -85,20 +85,21 @@ function drawRandomLines(){
 //Some fixed squares, representing objects（such as some buildings) that don't change
 
 function drawfixedRects(){
+  let rms = analyser.getLevel();
   let size = min(windowWidth, windowHeight)
   stroke(252, 224, 46);
   strokeWeight(size / 40);
   fill(239,17,17); //red
-  rect(0.037 * size, 0.186 * size, 0.125 * size, 0.2 * size);
+  rect(0.037 * size + rms * 100, 0.15 * size, 0.125 * size + rms * 200, 0.2 * size + rms * 200);
 
   fill(43,115,247); //blue
-  rect(0.625 * size, 0.15 * size, 0.125 * size, 0.2 * size);
+  rect(0.625 * size - rms * 100, 0.15 * size, 0.125 * size + rms * 200, 0.2 * size);
 
   fill (211,211,211); //gray
-  rect (0.138 * size, 0.725 * size, 0.2 * size, 0.125 * size);
+  rect (0.138 * size - rms * 100, 0.725 * size + rms * 100, 0.2 * size, 0.125 * size + rms * 200);
 
   fill(239,17,17); //red
-  rect(0.7 * size, 0.7 * size, 0.175 * size, 0.225 * size);
+  rect(0.7 * size - rms * 100, 0.7 * size - rms * 100, 0.175 * size + rms * 200, 0.225 * size + rms * 200);
 }
 
 //Random rects, representing objects that change over time
