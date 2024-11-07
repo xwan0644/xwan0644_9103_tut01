@@ -2,7 +2,8 @@ let song, analyser;
 let volume = 1.0;
 let pan = 0.0;
 let generatedRects = [];
-let generatedLines = [];
+let yPositions = [];
+let xPositions = [];
 // Load the sound file in preload
 function preload() {
   song = loadSound('asserts/BoogieWoogie.wav');
@@ -21,6 +22,7 @@ function setup() {
   // Set the action of the button by choosing what action and then a function to run
   button.mousePressed(play_pause);
   randomRect();
+  drawRandomLines();
 }
 
 function windowResized() {
@@ -29,13 +31,25 @@ function windowResized() {
     
 function draw() {
   background(255);
-  drawRandomLines();
+  
   drawfixedRects();
   
   for (let rectangle of generatedRects) {
     fill(rectangle.color);
     noStroke();
     rect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+  }
+
+  for (let y of yPositions ){
+    stroke(252, 224, 46);
+    strokeWeight(min(width, height) / 40);
+    line(0, y, min(width, height), y);
+  }
+
+  for (let x of xPositions ){
+    stroke(252, 224, 46);
+    strokeWeight(min(width, height) / 40);
+    line(x, 0, x, min(width, height));
   }
   drawColouredHorizontalRoad(min(width, height) / 40 * 21);
   drawColouredVerticalRoad(min(width, height) / 40 * 1);
@@ -48,28 +62,15 @@ function draw() {
 
 function drawRandomLines(){
   let size = min(windowWidth, windowHeight);
-  // Set the stroke color and weight for the yellow lines
-  stroke(252, 224, 46);
-  strokeWeight(size / 40);
+  xPositions = [0, size];
+  yPositions = [0, size];
   
-  let yPositions = [0, size];
   for (let i = 0; i < 5; i++){
     yPositions.push(random(50, size - 50));
   }
-  yPositions.sort((a,b) => a-b);
 
-  for (let y of yPositions ){
-    line(0, y, size, y);
-  }
-
-  let xPositions = [0, size];
   for (let j = 0; j < 5; j++){
     xPositions.push(random(50, size - 30));
-  }
-  xPositions.sort((a,b) => a-b);
-
-  for (let x of xPositions ){
-      line(x, 0, x, size);
   }
 
 }
@@ -81,6 +82,7 @@ function drawRandomLines(){
 
 function drawfixedRects(){
   let size = min(windowWidth, windowHeight)
+  stroke(252, 224, 46);
   strokeWeight(size / 40);
   fill(239,17,17); //red
   rect(0.037 * size, 0.186 * size, 0.125 * size, 0.2 * size);
