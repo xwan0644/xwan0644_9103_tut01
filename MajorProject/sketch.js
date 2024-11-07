@@ -1,7 +1,8 @@
 let song, analyser;
 let volume = 1.0;
 let pan = 0.0;
-
+let generatedRects = [];
+let generatedLines = [];
 // Load the sound file in preload
 function preload() {
   song = loadSound('asserts/BoogieWoogie.wav');
@@ -19,6 +20,7 @@ function setup() {
   button.position(10, 10);
   // Set the action of the button by choosing what action and then a function to run
   button.mousePressed(play_pause);
+  randomRect();
 }
 
 function windowResized() {
@@ -29,7 +31,12 @@ function draw() {
   background(255);
   drawRandomLines();
   drawfixedRects();
-  randomRect();
+  
+  for (let rectangle of generatedRects) {
+    fill(rectangle.color);
+    noStroke();
+    rect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+  }
   drawColouredHorizontalRoad(min(width, height) / 40 * 21);
   drawColouredVerticalRoad(min(width, height) / 40 * 1);
   drawColouredVerticalRoad(min(width, height) / 40 * 23);
@@ -91,6 +98,7 @@ function drawfixedRects(){
 //Random rects, representing objects that change over time
 
 function randomRect(){
+  
   let size = min(windowWidth, windowHeight);
   let colors = [
     [239,17,17], //red
@@ -106,6 +114,7 @@ function randomRect(){
     { x: 0.7 * size, y: 0.7 * size, w: 0.175 * size, h: 0.225 * size},
   ];
 
+  
   for (let i=0; i< 5; i++) {
     let rectSize = random(20,80);
     let x, y;
@@ -145,12 +154,10 @@ function randomRect(){
         }
       }
     }
-
     let color = random(colors);
-    fill(color);
-    noStroke();
-    rect(x,y,rectSize, rectSize);
+    generatedRects.push({ x, y, width: rectSize, height: rectSize, color });
   }
+  
 }
 
 // Xueying Wang
