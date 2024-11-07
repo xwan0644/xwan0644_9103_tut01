@@ -4,6 +4,9 @@ let pan = 0.0;
 let generatedRects = [];
 let yPositions = [];
 let xPositions = [];
+let horizontalRoad = [];
+let verticalRoad = [];
+
 // Load the sound file in preload
 function preload() {
   song = loadSound('asserts/BoogieWoogie.wav');
@@ -21,8 +24,15 @@ function setup() {
   button.position(10, 10);
   // Set the action of the button by choosing what action and then a function to run
   button.mousePressed(play_pause);
-  randomRect();
-  drawRandomLines();
+
+  generateRandomRect();
+  generateRandomLines();
+  generateColouredHorizontalRoad(min(width, height) / 40 * 15);
+  generateColouredHorizontalRoad(min(width, height) / 40 * 21);
+  generateColouredHorizontalRoad(min(width, height) / 40 * 37);
+  generateColouredVerticalRoad(min(width, height) / 40 * 1);
+  generateColouredVerticalRoad(min(width, height) / 40 * 13);
+  generateColouredVerticalRoad(min(width, height) / 40 *23);
 }
 
 function windowResized() {
@@ -32,35 +42,15 @@ function windowResized() {
 function draw() {
   background(255);
   
+  drawRandomLines();
+  drawRandomRect()
   drawfixedRects();
-  
-  for (let rectangle of generatedRects) {
-    fill(rectangle.color);
-    noStroke();
-    rect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
-  }
-
-  for (let y of yPositions ){
-    stroke(252, 224, 46);
-    strokeWeight(min(width, height) / 40);
-    line(0, y, min(width, height), y);
-  }
-
-  for (let x of xPositions ){
-    stroke(252, 224, 46);
-    strokeWeight(min(width, height) / 40);
-    line(x, 0, x, min(width, height));
-  }
-  drawColouredHorizontalRoad(min(width, height) / 40 * 21);
-  drawColouredVerticalRoad(min(width, height) / 40 * 1);
-  drawColouredVerticalRoad(min(width, height) / 40 * 23);
-  drawColouredHorizontalRoad(min(width, height) / 40 * 15);
-  drawColouredVerticalRoad(min(width, height) / 40 * 13);
-  drawColouredHorizontalRoad(min(width, height) / 40 * 37);
+  drawColouredHorizontalRoad();
+  drawColouredVerticalRoad();
   drawText();
 }
 
-function drawRandomLines(){
+function generateRandomLines(){
   let size = min(windowWidth, windowHeight);
   xPositions = [0, size];
   yPositions = [0, size];
@@ -73,6 +63,20 @@ function drawRandomLines(){
     xPositions.push(random(50, size - 30));
   }
 
+}
+
+function drawRandomLines(){
+  for (let y of yPositions){
+    stroke(252, 224, 46);
+    strokeWeight(min(width, height) / 40);
+    line(0, y, min(width, height), y);
+  }
+
+  for (let x of xPositions){
+    stroke(252, 224, 46);
+    strokeWeight(min(width, height) / 40);
+    line(x, 0, x, min(width, height));
+  }
 }
 
 
@@ -99,7 +103,7 @@ function drawfixedRects(){
 
 //Random rects, representing objects that change over time
 
-function randomRect(){
+function generateRandomRect(){
   
   let size = min(windowWidth, windowHeight);
   let colors = [
@@ -162,9 +166,18 @@ function randomRect(){
   
 }
 
+function drawRandomRect(){
+  for (let rectangle of generatedRects) {
+    fill(rectangle.color);
+    noStroke();
+    rect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+  }
+}
+
 // Xueying Wang
 // The function of drawing fixed yellow lines with three-color squares on it
-function drawColouredHorizontalRoad(y){
+function generateColouredHorizontalRoad(y){
+  
   let boxSize = min(width, height) / 40;
   let boxNumbers = min(width, height) / boxSize;
   let colourChoice;
@@ -181,14 +194,19 @@ function drawColouredHorizontalRoad(y){
     } else {
       colourChoice = random([color(239, 17, 17), color(43, 115, 247)]);
     }
-
-    fill(colourChoice);
-    noStroke();
-    rect(x, y, boxSize, boxSize);
+    horizontalRoad.push({ x, y, boxSize, colourChoice })
   }
 }
 
-function drawColouredVerticalRoad(x){
+function drawColouredHorizontalRoad(){
+  for (let square of horizontalRoad){
+    fill(square. colourChoice);
+    noStroke();
+    rect(square.x, square.y, square.boxSize, square.boxSize);
+  }
+}
+
+function generateColouredVerticalRoad(x){
   let boxSize = min(width, height) / 40;
   let boxNumbers = min(width, height) / boxSize;
   let colourChoice;
@@ -205,10 +223,16 @@ function drawColouredVerticalRoad(x){
     } else {
       colourChoice = random([color(239, 17, 17), color(43, 115, 247)]);
     }
+    verticalRoad.push({ x, y, boxSize, colourChoice })
 
-    fill(colourChoice);
+  }
+}
+
+function drawColouredVerticalRoad(){
+  for (let square of verticalRoad){
+    fill(square. colourChoice);
     noStroke();
-    rect(x, y, boxSize, boxSize);
+    rect(square.x, square.y, square.boxSize, square.boxSize);
   }
 }
 
