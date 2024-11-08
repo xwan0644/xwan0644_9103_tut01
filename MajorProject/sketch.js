@@ -32,9 +32,11 @@ function setup() {
   // Set the action of the button by choosing what action and then a function to run
   button.mousePressed(play_pause);
 
+  generateRandomLines();
   generateMusicRect()
   generateRandomRect();
-  generateRandomLines();
+  
+  generateColouredHorizontalRoad(min(width, height) / 40 * 3);
   generateColouredHorizontalRoad(min(width, height) / 40 * 15);
   generateColouredHorizontalRoad(min(width, height) / 40 * 21);
   generateColouredHorizontalRoad(min(width, height) / 40 * 37);
@@ -47,7 +49,18 @@ function setup() {
     
 function draw() {
   background(255);
-
+  
+  let spectrum = fft.analyze();
+  if (spectrum[2] > 230){
+    generateColouredHorizontalRoad(min(width, height) / 40 * 3);
+    generateColouredHorizontalRoad(min(width, height) / 40 * 21);
+    generateColouredVerticalRoad(min(width, height) / 40 * 1);
+    generateColouredVerticalRoad(min(width, height) / 40 *23);
+  } else if (spectrum[7] > 0){
+    generateColouredHorizontalRoad(min(width, height) / 40 * 15);
+    generateColouredHorizontalRoad(min(width, height) / 40 * 37);
+    generateColouredVerticalRoad(min(width, height) / 40 * 13);
+  }
   drawRandomRect();
   drawRandomLines();
   drawMusicRect();
@@ -58,6 +71,8 @@ function draw() {
 }
 
 function generateRandomLines(){
+  yPositions = [];
+  xPositions = [];
   let size = min(windowWidth, windowHeight);
   
   for (let i = 0; i < 5; i++){
@@ -191,7 +206,6 @@ function drawRandomRect(){
 
 // The functions of generating and drawing fixed yellow lines with three-color squares on it
 function generateColouredHorizontalRoad(y){
-  
   let boxSize = min(width, height) / 40;
   let boxNumbers = min(width, height) / boxSize;
   let colourChoice;
@@ -257,6 +271,7 @@ function drawColouredVerticalRoad(){
 function drawText() {
    // Draw the volume value on the screen
    fill(0);
+   noStroke();
    text('Volume: ' + volume.toFixed(2), min(width, height) - 80, min(width, height) / 30);
    // Draw the pan value on the screen
    text('Pan: ' + pan.toFixed(2), min(width, height) - 80, min(width, height) / 30 + 15);
@@ -321,4 +336,7 @@ function drawMusicRect(){
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
+  generatedRects = [];
+  horizontalRoad = [];
+  verticalRoad = [];
 }
