@@ -1,6 +1,10 @@
 let song, analyser;
 let volume = 1.0;
 let pan = 0.0;
+let fft;
+let numBins = 16;
+let smoothing = 0.8;
+let musicRects = [];
 let generatedRects = [];
 let yPositions = [];
 let xPositions = [];
@@ -14,10 +18,13 @@ function preload() {
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-
   analyser = new p5.Amplitude();
   // Connect the input of the analyser to the song
   analyser.setInput(song);
+
+  fft = new p5.FFT(smoothing, numBins);
+  song.connect(fft);
+
   // Add a button for play/pause
   let button = createButton('Play/Pause');
   // Set the position of the button to the bottom centre
@@ -25,6 +32,7 @@ function setup() {
   // Set the action of the button by choosing what action and then a function to run
   button.mousePressed(play_pause);
 
+  generateMusicRect()
   generateRandomRect();
   generateRandomLines();
   generateColouredHorizontalRoad(min(width, height) / 40 * 15);
@@ -35,15 +43,14 @@ function setup() {
   generateColouredVerticalRoad(min(width, height) / 40 *23);
 }
 
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
-}
+
     
 function draw() {
   background(255);
 
+  drawRandomRect();
   drawRandomLines();
-  drawRandomRect()
+  drawMusicRect();
   drawfixedRects();
   drawColouredHorizontalRoad();
   drawColouredVerticalRoad();
@@ -52,8 +59,6 @@ function draw() {
 
 function generateRandomLines(){
   let size = min(windowWidth, windowHeight);
-  xPositions = [0, size];
-  yPositions = [0, size];
   
   for (let i = 0; i < 5; i++){
     yPositions.push(random(50, size - 50));
@@ -66,21 +71,27 @@ function generateRandomLines(){
 }
 
 function drawRandomLines(){
+  let size = min(windowWidth, windowHeight);
+  
   for (let y of yPositions){
     stroke(252, 224, 46);
-    strokeWeight(min(width, height) / 40);
-    line(0, y, min(width, height), y);
+    strokeWeight (size/ 40);
+    line(0, y, size, y);
   }
+  line(0, 0, size, 0);
+  line(0, size, size, size);
 
   for (let x of xPositions){
     stroke(252, 224, 46);
-    strokeWeight(min(width, height) / 40);
-    line(x, 0, x, min(width, height));
+    strokeWeight(size / 40);
+    line(x, 0, x, size);
   }
+  line(0, 0, 0, size);
+  line(size, 0, size, size);
 }
 
 
-//Zichen Zhang
+
 //Generate red, blue and gray squares that appear in different positions each time they refresh
 //Some fixed squares, representing objects（such as some buildings) that don't change
 
@@ -89,6 +100,7 @@ function drawfixedRects(){
   let size = min(windowWidth, windowHeight)
   stroke(252, 224, 46);
   strokeWeight(size / 40);
+  rectMode(CORNER);
   fill(239,17,17); //red
   rect(0.037 * size + rms * 100, 0.15 * size, 0.125 * size + rms * 200, 0.2 * size + rms * 200);
 
@@ -171,12 +183,13 @@ function drawRandomRect(){
   for (let rectangle of generatedRects) {
     fill(rectangle.color);
     noStroke();
+    rectMode(CORNER);
     rect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
   }
 }
 
-// Xueying Wang
-// The function of drawing fixed yellow lines with three-color squares on it
+
+// The functions of generating and drawing fixed yellow lines with three-color squares on it
 function generateColouredHorizontalRoad(y){
   
   let boxSize = min(width, height) / 40;
@@ -206,6 +219,7 @@ function drawColouredHorizontalRoad(){
     rect(square.x, square.y, square.boxSize, square.boxSize);
   }
 }
+
 
 function generateColouredVerticalRoad(x){
   let boxSize = min(width, height) / 40;
@@ -238,6 +252,8 @@ function drawColouredVerticalRoad(){
 }
 
 
+
+// The function of drawing volume and pan text
 function drawText() {
    // Draw the volume value on the screen
    fill(0);
@@ -262,4 +278,47 @@ function mouseMoved() {
   // Map the mouseX to a pan value between -1 and 1
   pan = map(mouseX, 0, width, -1, 1);
   song.pan(pan);
+}
+
+class randomMusicRect{
+  constructor(){
+      this.x = random(0.8);
+      this.y = random(0.8);
+      this.size = random(0.1, 0.3);
+      this.color = random([color(239, 17, 17), color(43, 115, 247), color(211, 211, 211)]);
+      this.scale = 1;
+  }
+
+  display(scale){
+      this.scale = scale;
+      fill(this.color);
+      noStroke();
+      rectMode(CENTER);
+      let minDimension = min(width, height);
+      let size = this.size * minDimension;
+      size = size * this.scale;
+
+      let x = this.x * minDimension;
+      let y = this.y * minDimension;
+      rect(x, y, size, size);
+
+  }
+}
+
+// The functions of generating and drawing rectangles changing with music
+function generateMusicRect(){
+  for (let i = 0; i < numBins; i++) {
+    musicRects.push(new randomMusicRect());
+  }
+}
+
+function drawMusicRect(){
+  let spectrum = fft.analyze();
+  for (let i = 0; i < numBins; i++) {
+     musicRects[i].display(spectrum[i]/255);
+  }
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
 }
