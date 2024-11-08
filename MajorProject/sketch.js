@@ -70,6 +70,7 @@ function draw() {
   drawText();
 }
 
+// Generate randomized yellow lines
 function generateRandomLines(){
   yPositions = [];
   xPositions = [];
